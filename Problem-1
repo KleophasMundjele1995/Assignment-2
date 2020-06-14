@@ -1,0 +1,63 @@
+struct TBSupply
+    item::String
+    weight::Int64
+    value::Int64
+end
+
+## HillClimb Algorithm
+#algorithm Discrete Space Hill Climbing is
+function HillClimb(item, value, weight)
+        w = weight
+        v = value
+        itm = item
+        
+    currentNode = startNode
+    do
+        nextNode = neighborNode(currentNode)
+        nextEval := −INF
+        nextNode := NULL
+        for all i in nextNode do
+                if currentNode(i) > nextNode
+                nextNode = i
+                nextNode = currentNode(i)
+                        if nextnode ≤ currentNode(currentNode)
+                            #Return current node since no better neighbors exist
+                            return currentNode
+                            currentNode = nextNode
+                        end
+                end
+        end
+end
+## Function
+
+TBSupply{T<:Integer}(itm::AbstractString, w::Int64, v::Int64) = TBSupply(itm, w, v, )
+Base.show(io::IO, tbs::TBSupply) = print(io, " ", tbs.item, " ($(tbs.weight) g,   $(tbs.value))")
+
+function solve(tool::Vector{<:TBSupply}, capacity::Integer)
+#inputs
+        w = getfield.(tool, :weight)
+        v = getfield.(tool, :value)
+               
+        #
+        tool[sol.sol .≈ 1]
+end
+
+## Main
+
+tool = [TBSupply("Spanner", 11, 72),
+        TBSupply("Hammer", 15, 65),
+        TBSupply("Screwerdrive", 6, 68),
+        TBSupply("Socket", 3, 56),
+        TBSupply("Ratchet", 7, 56),
+        TBSupply("Jack", 22, 84),
+        TBSupply("Plier", 12, 94),
+        TBSupply("Over-roll", 30, 35),
+        TBSupply("Multimeter", 10, 68),
+        TBSupply("Test-lamp", 6, 62),        
+        TBSupply("Scissors", 3, 45),
+        TBSupply("J-Grip Reach", 12, 64)
+
+pack = solve(tool, 520)
+println("The Mechanic should pack: \n - ", join(pack, "\n - "))
+println("\nPacked weight: ", mapreduce(x -> x.weight, +, pack), " kg")
+println("Packed value: ", "N$" mapreduce(x -> x.value, +, pack))
