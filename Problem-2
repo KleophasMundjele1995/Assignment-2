@@ -1,108 +1,49 @@
-using Random
+# Assigning multiple initial values of Alpha and Beta to max and min variables
+max, min = 1000, -1000
 
-const size = 4
-const puzzle = string.(reshape(1:16, size, size))
-puzzle[16] = " "
-rng = MersenneTwister(Int64(round(time())))
-shufflepuzzle() = (puzzle .= shuffle(rng, puzzle))
-spotTile(t) = spotFirst(x->x == t, puzzle)
-spotHole() = spotTile(" ")
+# Returning optimal value for current player
+def miniMax(depth, nodeIndex, maxiMisingPlayer, values, alpha, beta)
 
-function isSolvable()
-    inversioncount = 1
-    asint(x) = (puzzle[x] == " ") ? 0 : parse(Int64, puzzle[x])
-    for i in 1:size^2-1, j in i:size^2
-        if puzzle[i] == " " || puzzle[j] == " "
-            continue
-        end
-        if parse(Int, puzzle[i]) < parse(Int, puzzle[j])
-            inversioncount += 1
-        end
-    end
-    if size % 2 == 1
-        return inversioncount % 2 == 0
-    end
-    pos = spotHole()
-    inversioncount += pos[2]
-    return inversioncount & 1 == 0
+# Conditional evaluation
+if depth == 3
+return values[nodeIndex]
+
+elseif maxiMisingPlayer
+best = min
 end
 
+for i in 0:2
+val = miniMax(depth + 1, nodeIndex * 2 + i, values, alpha, beta)
+best = max(best, val)
+alpha = max(alpha, best)
 
-function nextToHole()
-    holePos = spotHole()
-    row = holePos[1]
-    col = holePos[2]
-    if row == 1
-        if col == 1
-            return [[row, col + 1], [row + 1, col]]
-        elseif col == size
-            return [[row, col - 1], [row + 1, col]]
-        else
-            return [[row, col - 1], [row, col + 1], [row + 1, col]]
-        end
-    elseif row == size
-        if col == 1
-            return [[row - 1, col], [row, col + 1]]
-        elseif col == size
-            return [[row - 1, col], [row, col - 1]]
-        else
-            return [[row - 1, col], [row, col - 1], [row, col + 1]]
-        end
-    else
-        if col == 1
-            return [[row - 1, col], [row, col + 1], [row + 1, col]]
-        elseif col == size
-            return [[row - 1, col], [row, col - 1], [row + 1, col]]
-        else
-            return [[row - 1, col], [row, col - 1], [row, col + 1], [row + 1, col]]
-        end
-    end
-end
+while false
 
-possibleMoves() = map(pos->puzzle[pos[1], pos[2]], nextToHole())
-
-function moveHole(tileToFill)
-    if tileToFill in possibleMoves()
-        curpos = spotTile(tileToFill)
-        holePos = spotHole()
-        puzzle[holePos] = tileToFill
-        puzzle[curpos] = " "
-    else
-        println("Bad tile move $tileToFill.\nPossible moves are $(possibleMoves()).")
-    end
-end
-
-function drawBoard()
-    ppuz(x,y) = print(lpad(rpad(puzzle[x,y], 3), 4), "|")
-    print("+----+----+----+----+\n|")
-    for j in 1:size, i in 1:size
-        ppuz(i,j)
-        if i == size
-            print("\n")
-            if j < size
-                 print("|")
-            end
-        end
-    end
-    println("+----+----+----+----+")
+# Alpha Beta Pruning
+if beta <= alpha
+break
 
 end
+return best
 
-function puzzlePlay()
-    solved() = (puzzle[1:15] == string.(1:15))
-    shufflepuzzle()
-    println("This puzzle is", isSolvable() ? " " : " not ", "solvable.")
-    while !solved()
-        drawBoard()
-        print("Possible moves are: $(possibleMoves()), 0 to exit. Your move? =>  ")
-        s = readline()
-        if s == "0"
-            exit(0)
-        end
-        moveHole(s)
-    end
-    drawBoard()
-    println("Puzzle solved.")
+end
+else
+
+best = max
+for i in 0:2
+val = miniMax(depth + 1, nodeIndex * 2 + i, values, alpha, beta)
+best = min(best, val)
+alpha = min(alpha, best)
+
+while true
+
+# Alpha Beta Pruning
+if beta <= alpha
+break
+end
+return best
 end
 
-puzzlePlay()
+if name == main
+values = [0, 2, 3, 1, -2, 4]
+print("Final result is :", miniMax(0, 0, true, values, min, max))
